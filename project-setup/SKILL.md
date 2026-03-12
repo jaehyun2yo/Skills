@@ -40,15 +40,15 @@ Check: build/test commands, architecture, conventions, session protocol, context
 
 Use scoring criteria from → [checklist.md](checklist.md)
 
-10 categories (A–J), 39 points total. Grade:
+11 categories (A–K), 46 points total. Grade:
 
 | Score | Grade |
 |-------|-------|
-| 33-39 | A — Production-ready |
-| 26-32 | B — Good, minor gaps |
-| 19-25 | C — Significant gaps |
-| 12-18 | D — Many missing pieces |
-| 0-11  | F — Minimal or no setup |
+| 39-46 | A — Production-ready |
+| 31-38 | B — Good, minor gaps |
+| 23-30 | C — Significant gaps |
+| 14-22 | D — Many missing pieces |
+| 0-13  | F — Minimal or no setup |
 
 ---
 
@@ -97,6 +97,6 @@ Re-score, show before/after comparison, list created files, suggest next steps.
 ---
 
 ## Supporting Files
-- [checklist.md](checklist.md) — Scoring criteria (A–J, 39 items)
-- [setup-templates.md](setup-templates.md) — File templates for all configurable items
+- [checklist.md](checklist.md) — Scoring criteria (A–K, 46 items)
+- [setup-templates.md](setup-templates.md) — File templates for all configurable items (includes Agent Team templates)
 - [tech-profiles.md](tech-profiles.md) — Tech stack-specific placeholder values

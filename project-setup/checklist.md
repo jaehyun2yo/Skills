@@ -18,14 +18,16 @@
 
 ---
 
-## B. Hooks (4 points)
+## B. Hooks (6 points)
 
 | # | Item | ✅ | ⚠️ | ❌ |
 |---|------|----|----|-----|
 | B1 | SessionStart hook | Shows progress + git + pending items | Shows minimal info | None |
-| B2 | Stop hook | Checks progress + commits + spec sync | Checks 1-2 items | None |
+| B2 | Stop hook | Checks progress + commits + handoff + spec sync | Checks 1-2 items | None |
 | B3 | PostToolUse hook (optional) | Typecheck or format after edits | Partial | None (0.5 max) |
 | B4 | Hook quality | English, script-based for complex logic | Inline + Korean | Broken or missing |
+| B5 | PreCompact hook | Auto-generates .claude/handoff.md before compaction | Mentioned but no implementation | None |
+| B6 | SessionStart matchers | Separate matchers for startup/compact/clear with handoff auto-load | Single matcher, no handoff load | None |
 
 ---
 
@@ -110,3 +112,15 @@
 | J1 | Test framework configured | Config file + project-specific settings | Default config | None |
 | J2 | Test files exist | > 10 test files with actual cases | 1-10 files | None |
 | J3 | Test commands documented | In CLAUDE.md with single-file pattern | Basic command only | Not documented |
+
+---
+
+## K. Agent Team Readiness (5 points)
+
+| # | Item | ✅ | ⚠️ | ❌ |
+|---|------|----|----|-----|
+| K1 | Team env enabled | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"` in settings.json | Mentioned but not configured | Not set |
+| K2 | CLAUDE.md team-optimized | <= 500 lines, has build/test/conventions (teammates auto-load this — brevity saves tokens per teammate) | 501-1000 lines or missing key info | No CLAUDE.md or > 1000 lines |
+| K3 | Directory ownership rules | Explicit directory-to-role mapping documented | Partial or vague file boundaries | None |
+| K4 | Team composition patterns | Documented patterns for common scenarios (review, debug, implement) | Some patterns mentioned | None |
+| K5 | Team cost strategy | Model routing documented (Opus lead, Sonnet teammates) + cleanup protocol | Partial (model mentioned, no protocol) | None |
