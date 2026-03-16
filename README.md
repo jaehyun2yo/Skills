@@ -29,6 +29,7 @@ Done. Skills auto-trigger by keyword — no manual setup needed.
 | [dev-wrap](dev-wrap/) | "마무리", "wrap up", "커밋하고 끝" | Session end — generates handoff.md, cleans up teams, commits, updates docs |
 | [project-setup](project-setup/) | "셋업", "setup", "프로젝트 설정" | Scans project → scores (A-K, 46pts) → generates missing config with approval |
 | [skill-register](skill-register/) | "스킬 등록", "register skill" | Scans skills → registers to CLAUDE.md triggers table → creates symlinks |
+| [code-polish](code-polish/) | "코드정리", "리팩토링", "code polish" | Auto-cleans changed files — dead code removal, optimization, refactoring. Auto-triggers via Stop hook |
 | [usage-guide](usage-guide/) | "사용법", "usage guide", "매뉴얼" | Generates unified usage doc covering all skills, hooks, plugins, agents |
 
 ## Auto Session Handoff
@@ -196,7 +197,7 @@ When lead's context fills during team work:
   ↓ coding...
   ↓ context full → /clear       → auto handoff + restore
   ↓ more coding...
-"마무리"                        → dev-wrap commits + generates handoff
+"마무리" (or session end)       → code-polish auto-cleans → dev-wrap commits + handoff
 ```
 
 ### Project Onboarding
