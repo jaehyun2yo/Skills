@@ -1,6 +1,6 @@
 ---
 name: code-polish
-description: Automatically reviews and polishes changed code — cleanup dead code, optimize performance, refactor for readability. Auto-triggers via Stop hook after coding sessions. Triggers on "코드정리", "코드 최적화", "리팩토링", "code polish", "cleanup code", "정리해", "optimize code", "코드 다듬어", "polish".
+description: Auto-cleanup changed source files — remove dead code, improve naming, optimize loops, strengthen types. Validates with lint/test, rolls back on failure. Auto-triggers via Stop hook. Triggers on "코드정리", "코드 최적화", "리팩토링", "code polish", "cleanup code", "정리해", "optimize code", "코드 다듬어", "polish".
 ---
 
 # Code Polish — 코드 정리 · 최적화 · 리팩토링
@@ -172,6 +172,55 @@ git checkout -- . 2>/dev/null  # 미커밋 변경 전체 복원
 
 ---
 
+## Step 6: 패턴 학습 (Self-Improving)
+
+정리 작업 결과를 학습 데이터로 축적하여 다음 실행의 정확도를 높인다.
+
+### 6.1 패턴 기록
+
+정리 리포트의 각 변경 항목을 `.claude/polish-patterns.json`에 기록:
+
+```json
+{
+  "patterns": [
+    {
+      "category": "dead-code",
+      "pattern": "unused-import",
+      "files": ["src/foo.ts", "src/bar.ts"],
+      "count": 5,
+      "firstSeen": "2026-03-01",
+      "lastSeen": "2026-03-16"
+    }
+  ],
+  "totalRuns": 12,
+  "lastRun": "2026-03-16"
+}
+```
+
+- 이미 기록된 패턴이면 `count` 증가, `lastSeen` 갱신, `files` 배열에 추가
+- 새 패턴이면 항목 추가
+- `totalRuns` 매 실행마다 +1
+
+### 6.2 고빈도 패턴 우선 검사
+
+다음 실행 시 Step 3 진입 전에 `.claude/polish-patterns.json`을 읽고:
+- `count >= 3`인 패턴을 **우선 검사 대상**으로 설정
+- 해당 카테고리의 체크리스트를 먼저 적용
+
+### 6.3 반복 패턴 경고
+
+`count >= 3`인 패턴이 있으면 리포트 끝에 추가:
+
+```
+### 반복 패턴 경고
+- `unused-import` — 5회 반복 (dead-code). ESLint `no-unused-imports` 규칙 추가 권장
+- `magic-number` — 3회 반복 (quality). 프로젝트 상수 파일 도입 권장
+
+💡 반복 패턴은 lint 규칙이나 팀 컨벤션으로 근본 해결하는 것이 효과적입니다.
+```
+
+---
+
 ## Rules
 
 1. **변경 파일만 대상** — 이번 세션에서 수정한 파일만 검토. 다른 파일은 절대 건드리지 않음
@@ -184,3 +233,4 @@ git checkout -- . 2>/dev/null  # 미커밋 변경 전체 복원
 8. **사용자 확인 후 커밋** — 자동 커밋 금지. 변경 diff 보여주고 승인 받기
 9. **안전 순서** — 제거 → 품질 → 최적화 → 타입 순서 (안전한 것부터)
 10. **테스트 코드도 정리** — 테스트 파일이 변경 대상이면 동일 기준 적용 (단, 테스트 의도는 변경 금지)
+11. **패턴 학습** — `.claude/polish-patterns.json`에 발견 패턴을 기록한다. 3회 이상 반복되면 리포트에 경고하고 lint 규칙 추가를 권장한다. 학습 데이터는 git에 커밋하지 않음

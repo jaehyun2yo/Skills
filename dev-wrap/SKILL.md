@@ -1,6 +1,6 @@
 ---
 name: dev-wrap
-description: Development session wrap-up — commits changes, cleans up agent teams, updates progress/features/changelog, prepares for next session handoff. Also auto-runs via Stop hook. Triggers on "마무리", "wrap up", "세션 정리", "오늘 여기까지", "커밋하고 끝", "세션 끝", "마무리하자".
+description: Session wrap-up — commits changes, shuts down Agent Teams, updates progress/features/changelog, generates handoff for next session. Triggers on "마무리", "끝", "done", "wrap up", "세션 정리", "오늘 여기까지", "커밋하고 끝", "정리해줘", "세션 끝", "마무리하자".
 ---
 
 # Dev Wrap — 개발 세션 마무리

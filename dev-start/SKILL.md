@@ -1,6 +1,6 @@
 ---
 name: dev-start
-description: Development session initializer — reads progress, checks pending tasks, shows git state, detects active teams, suggests next work. Auto-triggers on session start or coding start keywords. Triggers on "개발 시작", "코딩 시작", "시작하자", "start coding", "start dev", "작업 시작", "뭐하고 있었지", "이어서 개발", "어디까지 했지".
+description: Session initializer — loads handoff state, shows git/progress status, suggests next work, detects complex tasks for Agent Team. Triggers on "개발 시작", "코딩 시작", "시작하자", "start coding", "start dev", "작업 시작", "뭐하고 있었지", "이어서 개발", "어디까지 했지".
 ---
 
 # Dev Start — 개발 세션 시작

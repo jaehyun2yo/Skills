@@ -4,7 +4,7 @@
 
 ---
 
-## A. CLAUDE.md Quality (7 points)
+## A. CLAUDE.md Quality (8 points)
 
 | # | Item | ✅ | ⚠️ | ❌ |
 |---|------|----|----|-----|
@@ -12,22 +12,27 @@
 | A2 | Build/test commands | All commands (dev, build, test, lint, typecheck) | Some commands | No commands |
 | A3 | Architecture overview | Tech stack + directory structure + key patterns | Only tech stack | None |
 | A4 | Coding conventions | Project-specific rules (3+) | Generic rules only | None |
-| A5 | Session protocol | Start + end + stuck protocol | Partial (1-2 of 3) | None |
-| A6 | Context management | Thresholds + large file warnings | Mentioned but vague | None |
+| A5 | Session protocol | Start + end + stuck + Plan Mode + /insights | Partial (1-2 of 3) | None |
+| A6 | Context management | Proactive /compact at 60-70% + compact instructions + large file warnings | Thresholds but no compact instructions | None |
 | A7 | Skill triggers table | Table mapping keywords to skills | Skills mentioned, no table | None |
+| A8 | Extended thinking guide | think/ultrathink usage table with cost awareness | Mentioned but no guide | None |
 
 ---
 
-## B. Hooks (6 points)
+## B. Hooks (8 points)
 
 | # | Item | ✅ | ⚠️ | ❌ |
 |---|------|----|----|-----|
 | B1 | SessionStart hook | Shows progress + git + pending items | Shows minimal info | None |
 | B2 | Stop hook | Checks progress + commits + handoff + spec sync | Checks 1-2 items | None |
-| B3 | PostToolUse hook (optional) | Typecheck or format after edits | Partial | None (0.5 max) |
+| B3 | PostToolUse hook | Auto-format after edits (Prettier/ruff/gofmt) | Partial (format only) | None |
 | B4 | Hook quality | English, script-based for complex logic | Inline + Korean | Broken or missing |
 | B5 | PreCompact hook | Auto-generates .claude/handoff.md before compaction | Mentioned but no implementation | None |
 | B6 | SessionStart matchers | Separate matchers for startup/compact/clear with handoff auto-load | Single matcher, no handoff load | None |
+| B7 | Async Hook usage | `async: true` on heavy analysis hooks (Stop/PostToolUse) | Mentioned but not applied | None |
+| B8 | HTTP Hook configuration | Remote validation/policy server connected | URL configured but untested | None |
+| B9 | MCP Tool Matching Hook | `mcp__*` pattern in PreToolUse/PostToolUse matchers | Pattern exists but no logic | None |
+| B10 | PreToolUse security gate | Blocks dangerous commands (rm -rf, DROP TABLE, force push) | Partial pattern list | None |
 
 ---
 
@@ -105,13 +110,20 @@
 
 ---
 
-## J. Testing (3 points)
+## J. Testing & Development Methodology (6 points)
 
 | # | Item | ✅ | ⚠️ | ❌ |
 |---|------|----|----|-----|
 | J1 | Test framework configured | Config file + project-specific settings | Default config | None |
 | J2 | Test files exist | > 10 test files with actual cases | 1-10 files | None |
 | J3 | Test commands documented | In CLAUDE.md with single-file pattern | Basic command only | Not documented |
+| J4 | TDD/SDD rules file | `.claude/rules/tdd-sdd.md` with spec-first + test-first + regression + bug-fix workflow | Partial rules (TDD or SDD only) | None |
+| J5 | TDD enforcement | Red-Green-Refactor mandatory, regression test required, bug-fix reproduction test required | TDD mentioned but no enforcement detail | None |
+| J6 | SDD enforcement | Spec-first mandatory, spec-code sync rules, acceptance criteria required | Spec mentioned but no enforcement | None |
+
+---
+
+**Note:** J4-J6 are checked by scanning `.claude/rules/tdd-sdd.md` or equivalent methodology rules. For existing projects, check all files under `.claude/rules/` for TDD/SDD keywords.
 
 ---
 

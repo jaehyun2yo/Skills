@@ -16,6 +16,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: npm run test / pnpm test
 {{TYPECHECK_COMMAND}}: npx tsc --noEmit
 {{LINT_COMMAND}}: npm run lint / pnpm lint
+{{FORMAT_COMMAND}}: npx prettier --write "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - No `any` types
   - Server Components by default, 'use client' only when interactive
@@ -75,6 +76,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: npm run test
 {{TYPECHECK_COMMAND}}: npm run typecheck / npx tsc --noEmit
 {{LINT_COMMAND}}: npm run lint
+{{FORMAT_COMMAND}}: npx prettier --write "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - Interface prefix: I (ILogger, ISyncEngine)
   - IPC types defined in shared types file
@@ -113,6 +115,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: pytest / python -m pytest
 {{TYPECHECK_COMMAND}}: mypy . / pyright
 {{LINT_COMMAND}}: ruff check . / flake8
+{{FORMAT_COMMAND}}: ruff format "$CLAUDE_FILE_PATH" 2>/dev/null || black "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - Type hints on all function signatures
   - Pydantic models for request/response validation
@@ -147,6 +150,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: cargo test
 {{TYPECHECK_COMMAND}}: cargo check
 {{LINT_COMMAND}}: cargo clippy
+{{FORMAT_COMMAND}}: rustfmt "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - Proper error handling (Result<T, E>, no unwrap in production)
   - Derive macros for common traits
@@ -173,6 +177,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: flutter test
 {{TYPECHECK_COMMAND}}: flutter analyze
 {{LINT_COMMAND}}: dart format --set-exit-if-changed .
+{{FORMAT_COMMAND}}: dart format "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - BLoC/Cubit for state management
   - Freezed for immutable models
@@ -199,6 +204,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: go test ./...
 {{TYPECHECK_COMMAND}}: go vet ./...
 {{LINT_COMMAND}}: golangci-lint run
+{{FORMAT_COMMAND}}: gofmt -w "$CLAUDE_FILE_PATH" 2>/dev/null || true
 {{CONVENTIONS_CHECKLIST}}:
   - Error handling (no ignored errors)
   - Interface-based design
@@ -222,6 +228,7 @@ Only read the section matching the detected stack — do not load entire file.
 {{TEST_COMMAND}}: (detect from package.json scripts or Makefile)
 {{TYPECHECK_COMMAND}}: (if available)
 {{LINT_COMMAND}}: (if available)
+{{FORMAT_COMMAND}}: echo "No formatter configured" (detect from project config)
 {{CONVENTIONS_CHECKLIST}}:
   - No hardcoded secrets
   - Consistent naming conventions

@@ -1,6 +1,6 @@
 ---
 name: usage-guide
-description: Generates a project-specific usage guide covering registered skills, MCP plugins, hooks, agents, and commands — a single reference document for the team. Triggers on "사용법", "usage guide", "가이드 작성", "매뉴얼", "how to use", "사용 문서".
+description: Generates project-specific unified usage guide covering all skills, MCP plugins, hooks, agents, and commands as a single reference document. Triggers on "사용법", "usage guide", "가이드 작성", "매뉴얼", "how to use", "사용 문서".
 ---
 
 # Usage Guide Generator

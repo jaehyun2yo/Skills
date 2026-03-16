@@ -1,6 +1,6 @@
 ---
 name: skill-register
-description: Scans created skills and registers them into the target project — updates CLAUDE.md skill triggers table, creates symlinks, verifies triggering works. Use after skill creation is complete. Triggers on "스킬 등록", "register skill", "스킬 연결", "skill register", "등록해줘".
+description: Discovers created skills, registers to CLAUDE.md trigger table, creates symlinks to ~/.claude/skills/, verifies resolution. Triggers on "스킬 등록", "register skill", "스킬 연결", "skill register", "등록해줘".
 ---
 
 # Skill Register

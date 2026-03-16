@@ -27,10 +27,15 @@ Done. Skills auto-trigger by keyword — no manual setup needed.
 |-------|----------|--------------|
 | [dev-start](dev-start/) | "시작하자", "start coding", "이어서 개발" | Session init — loads handoff, shows state, suggests next work. Complex tasks → Agent Team suggestion |
 | [dev-wrap](dev-wrap/) | "마무리", "wrap up", "커밋하고 끝" | Session end — generates handoff.md, cleans up teams, commits, updates docs |
-| [project-setup](project-setup/) | "셋업", "setup", "프로젝트 설정" | Scans project → scores (A-K, 46pts) → generates missing config with approval |
+| [project-setup](project-setup/) | "셋업", "setup", "프로젝트 설정" | Scans project → scores (A-K, 48pts) → generates missing config with approval |
 | [skill-register](skill-register/) | "스킬 등록", "register skill" | Scans skills → registers to CLAUDE.md triggers table → creates symlinks |
 | [code-polish](code-polish/) | "코드정리", "리팩토링", "code polish" | Auto-cleans changed files — dead code removal, optimization, refactoring. Auto-triggers via Stop hook |
 | [usage-guide](usage-guide/) | "사용법", "usage guide", "매뉴얼" | Generates unified usage doc covering all skills, hooks, plugins, agents |
+| [team-setup](team-setup/) | "팀 셋업", "team setup", "팀 시스템 설정" | Scans project → identifies domains → generates tailored team skills + hooks + rules |
+| [team-dispatcher](team-dispatcher/) | "팀 불러와", "팀 소집", "team dispatch" | Analyzes user request → auto-selects right team (bugfix/review/feature/etc) |
+| [skill-eval](skill-eval/) | "스킬 평가", "eval skill", "benchmark skill" | Eval/benchmark/A/B compare skills — measures pass rate, tokens, time |
+| [security-guard](security-guard/) | "보안 검사", "security check", "security scan" | OWASP Top 10 auto-scan for changed code, blocks dangerous commands via PreToolUse |
+| [qa-tester](qa-tester/) | "QA", "E2E 테스트", "qa test", "실사용 테스트" | E2E QA — auto-detects platform (Web/Electron/Tauri/Flutter), runs app, tests user flows, reports bugs |
 
 ## Auto Session Handoff
 

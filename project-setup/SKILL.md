@@ -1,6 +1,6 @@
 ---
 name: project-setup
-description: Evaluates current Claude Code project setup, scores it, recommends improvements tailored to the project's tech stack and needs, and creates missing files with user approval. Use when starting a new project, onboarding to existing code, or when the setup feels incomplete. Triggers on "setup", "셋업", "셋팅", "configure", "설정", "프로젝트 설정", "project setup", "초기 설정", "init setup".
+description: Scores project setup (48-point checklist across 11 categories), recommends improvements tailored to tech stack, generates missing configs with user approval. Triggers on "setup", "셋업", "셋팅", "configure", "설정", "프로젝트 설정", "project setup", "초기 설정", "init setup".
 ---
 
 # Project Setup Skill
@@ -31,8 +31,19 @@ find . \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*" \) | grep -v no
 git log --oneline -5 2>/dev/null
 ```
 
-**1.3 CLAUDE.md Analysis** (if exists)
-Check: build/test commands, architecture, conventions, session protocol, context management, skill triggers.
+**1.3 Development Methodology Check**
+```bash
+# Check for TDD/SDD rules (any naming convention)
+cat .claude/rules/tdd-sdd.md 2>/dev/null || \
+  grep -rl "TDD\|SDD\|test-first\|spec-first" .claude/rules/ 2>/dev/null || \
+  echo "NO_TDD_SDD_RULES"
+# Check CLAUDE.md for methodology section
+grep -i "TDD\|SDD\|test-driven\|spec-driven" CLAUDE.md 2>/dev/null || echo "NO_METHODOLOGY_IN_CLAUDE_MD"
+```
+If TDD/SDD rules exist, score J4-J6 accordingly. If missing, flag as `[🔴 Critical]` recommendation.
+
+**1.4 CLAUDE.md Analysis** (if exists)
+Check: build/test commands, architecture, conventions, session protocol, context management, skill triggers, development methodology (TDD/SDD).
 
 ---
 
@@ -40,15 +51,15 @@ Check: build/test commands, architecture, conventions, session protocol, context
 
 Use scoring criteria from → [checklist.md](checklist.md)
 
-11 categories (A–K), 46 points total. Grade:
+11 categories (A–K), 50 points total. Grade:
 
 | Score | Grade |
 |-------|-------|
-| 39-46 | A — Production-ready |
-| 31-38 | B — Good, minor gaps |
-| 23-30 | C — Significant gaps |
-| 14-22 | D — Many missing pieces |
-| 0-13  | F — Minimal or no setup |
+| 43-50 | A — Production-ready |
+| 34-42 | B — Good, minor gaps |
+| 25-33 | C — Significant gaps |
+| 15-24 | D — Many missing pieces |
+| 0-14  | F — Minimal or no setup |
 
 ---
 
