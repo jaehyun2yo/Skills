@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: Generates comprehensive project specification documents (PRD, Project Constitution, SRS, SDS, functional spec, screen design, API spec, DB spec, test spec, implementation plan) step by step with full traceability between documents. Use this skill whenever a user wants to plan a new project, write planning docs, create specifications, document an existing codebase, or mentions any of these keywords - even if they only ask for one document type. Triggers on "기획", "기획문서", "명세서", "PRD", "SRS", "SDS", "spec", "specification", "문서작성", "프로젝트 기획", "project planning", "요구사항", "설계문서", "API 명세", "DB 명세", "기능명세", "화면설계", "테스트 명세", "구현 계획", "constitution", "wireframe".
+description: Generates comprehensive project specification documents (PRD, Project Constitution, SRS, SDS, functional spec, screen design, API spec, DB spec, test spec, implementation plan) step by step with full traceability between documents. Use this skill whenever a user wants to plan a new project, write planning docs, create specifications, document an existing codebase, or mentions any of these keywords - even if they only ask for one document type. Triggers on "기획", "기획문서", "명세서", "PRD", "SRS", "SDS", "spec", "specification", "문서작성", "프로젝트 기획", "project planning", "요구사항", "설계문서", "API 명세", "DB 명세", "기능명세", "화면설계", "테스트 명세", "구현 계획", "constitution", "wireframe", "기획문서 셋업".
 ---
 
 # Spec Writer — 프로젝트 기획문서 생성기
