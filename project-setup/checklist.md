@@ -114,16 +114,20 @@
 
 | # | Item | ✅ | ⚠️ | ❌ |
 |---|------|----|----|-----|
-| J1 | Test framework configured | Config file + project-specific settings | Default config | None |
+| J1 | Test framework configured (incl. E2E) | Config file + E2E framework (Playwright/Cypress/etc.) | Test framework only, no E2E | None |
 | J2 | Test files exist | > 10 test files with actual cases | 1-10 files | None |
-| J3 | Test commands documented | In CLAUDE.md with single-file pattern | Basic command only | Not documented |
+| J3 | Test commands documented | In CLAUDE.md with single-file pattern + E2E command | Basic command only | Not documented |
 | J4 | TDD/SDD rules file | `.claude/rules/tdd-sdd.md` with spec-first + test-first + regression + bug-fix workflow | Partial rules (TDD or SDD only) | None |
-| J5 | TDD enforcement | Red-Green-Refactor mandatory, regression test required, bug-fix reproduction test required | TDD mentioned but no enforcement detail | None |
+| J5 | TDD enforcement + E2E-first | Red-Green-Refactor mandatory, E2E tests satisfy test-first mandate, regression required | TDD mentioned but no E2E-first or enforcement detail | None |
 | J6 | SDD enforcement | Spec-first mandatory, spec-code sync rules, acceptance criteria required | Spec mentioned but no enforcement | None |
+| J7 | E2E directory structure | `e2e/` + `pages/` + `flows/` + `fixtures/` exist | `e2e/` exists but incomplete structure | None |
+| J8 | E2E run command documented | CLAUDE.md contains E2E execution command + single-file E2E command | E2E command exists but incomplete | Not documented |
 
 ---
 
-**Note:** J4-J6 are checked by scanning `.claude/rules/tdd-sdd.md` or equivalent methodology rules. For existing projects, check all files under `.claude/rules/` for TDD/SDD keywords.
+**Note:** J4-J6 are checked by scanning `.claude/rules/tdd-sdd.md` or equivalent methodology rules. J7-J8 are checked by scanning the project directory structure and CLAUDE.md. For existing projects, check all files under `.claude/rules/` for TDD/SDD keywords.
+
+**Scoring note:** J category was redistributed from the original 6 points to 8 items. J1-J4 = 1pt each, J5-J6 = 0.5pt each (split from original 1pt), J7-J8 = 0.5pt each (new). Total remains 6 points.
 
 ---
 

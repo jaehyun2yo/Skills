@@ -192,14 +192,14 @@ Domain size analysis:
 ```markdown
 # Agent Team Rules (All Teammates)
 
-## Development Methodology: SDD + TDD (Mandatory)
+## Development Methodology: SDD + TDD + E2E-First (Mandatory)
 1. Spec first (SDD): Read feature spec before coding. If none exists, create one first.
-2. Test first (TDD): Write failing test → implement → pass → refactor.
-3. E2E first: E2E tests are the DEFAULT test type. Write user-flow-based E2E tests before unit tests.
-4. Full rules: `.claude/rules/tdd-sdd.md` (if exists, MUST follow)
+2. E2E first: E2E tests are the PRIMARY pre-implementation tests and satisfy the TDD "test-first" mandate.
+3. Unit tests are complementary, not required before implementation.
+4. Full rules: `.claude/rules/tdd-sdd.md` (if exists, MUST follow — note: E2E tests fulfill the "write failing test" step)
 
-## E2E Testing (Mandatory for QA Tester)
-QA Tester must use the correct E2E tool based on platform:
+## E2E Testing (Mandatory for All Implementation Agents)
+Use the correct E2E tool based on platform:
 - Web apps → Playwright
 - Electron apps → Playwright Electron API (`_electron.launch`)
 - Tauri apps → WebdriverIO
@@ -207,38 +207,104 @@ QA Tester must use the correct E2E tool based on platform:
 - API only → Playwright API testing / supertest
 Platform is auto-detected. See `qa-tester` skill for details.
 
-## Workflow Per Task
-1. Read spec (if no spec, create one first)
-2. Write failing test (RED) — including edge cases and error scenarios
-3. Implement code (GREEN) — minimal code to pass tests
-4. Code polish (REFACTOR) — keep tests green
-5. Run FULL test suite — ALL existing tests must pass (regression check)
-6. Type check + lint pass
-7. Submit to lead with test evidence
+## Task Execution Pipeline (Mandatory)
+
+### Precondition: E2E Infrastructure
+- If no E2E framework is detected (no config file, no `e2e/` directory):
+  Set up E2E infrastructure first (per project-setup E2E scaffolding template).
+- If E2E framework exists: proceed to Phase 1.
+
+### Phase 1: Spec Confirmation
+- Read spec/PRD. If none exists, create one first.
+- Identify core user flows (based on acceptance criteria).
+
+### Phase 2: E2E Test — Core Flows (Pre-Implementation)
+- Write E2E tests for identified core user flows.
+- Run tests → MUST confirm FAIL (RED).
+- Commit E2E test files (creates timestamp evidence for verification gate).
+- Report test file paths and failure results to team lead.
+  Example: "e2e/flows/login.spec.ts — 3 tests, 3 failed (expected)"
+
+### Phase 3: Implementation (GREEN)
+- Implement code to pass the E2E tests.
+- Unit tests may be added freely during implementation.
+
+### Phase 4: E2E Verification
+- Run FULL E2E test suite.
+- Generate concise report:
+  ✅ passed: 12  ❌ failed: 1  ⏱ duration: 8.3s
+  FAIL: e2e/flows/checkout.spec.ts > "order confirmation after payment"
+  Error: Expected status 200, got 500
+- ALL PASS → Phase 6
+- ANY FAIL → Phase 5
+
+### Phase 5: Fix Loop (max 3 rounds)
+Round N:
+  1. Debugger: Analyze failure root cause + generate report
+  2. Debugger: Verify whether the TEST ITSELF is correct
+     - If test is wrong → propose test fix (not code fix)
+     - If code is wrong → proceed to step 3
+  3. Implementation agent: Write fix plan
+  4. Team lead: Review fix plan → approve/reject
+     - If rejected: implementation agent revises plan and resubmits
+       (max 2 plan revisions per round, does NOT count toward 3-round limit)
+     - If approved: proceed to step 5
+  5. Implementation agent: Execute approved fix
+  6. Re-run E2E suite → PASS → Phase 6, FAIL → Round N+1
+
+  After 3 failures:
+  - Generate escalation report with failure history
+  - Set task status → BLOCKED
+  - Escalate to user with:
+    ⚠️ E2E Fix Loop Failed 3 Times — User Intervention Required
+    Task: {task name}
+    Failed test: {test file}:{test name}
+    Attempts:
+      Round 1: {root cause} → {fix applied} → test validity: {VALID/INVALID/N/A} → FAIL
+      Round 2: {root cause} → {fix applied} → test validity: {VALID/INVALID/N/A} → FAIL
+      Round 3: {root cause} → {fix applied} → test validity: {VALID/INVALID/N/A} → FAIL
+
+### Phase 6: Edge Cases + Polish
+- Add edge case / error scenario E2E tests.
+- Refactor code (keep tests green).
+- Run full test suite (final).
+- Report to team lead with E2E results.
+
+### Fix Loop Report Format
+## Fix Loop Report — Round {N}
+- Failed test: {test file}:{test name}
+- Error: {error message}
+- Root cause: {debugger analysis}
+- Test validity: VALID / INVALID / N/A (if invalid: proposed test fix)
+- Fix plan: {description}
+- Lead approved: yes/no (if no: revision count)
+- Result after fix: PASS/FAIL
 
 ## Bug Fix Workflow (Critical)
-1. Write test that reproduces the bug → verify it FAILS
+1. Write E2E test that reproduces the bug → verify it FAILS
 2. Implement fix → verify reproduction test PASSES
-3. Run FULL test suite → no regressions allowed
+3. Run FULL E2E test suite → no regressions allowed
 4. Verify related functionality still works
 5. Report to lead: bug reproduction test + full suite results
 
 ## Forbidden Patterns
 - ❌ Code without spec
-- ❌ Code before tests
+- ❌ Code before E2E tests (for core flows)
 - ❌ Marking complete with failing tests
 - ❌ Running only new tests (skipping regression suite)
 - ❌ Deleting failing tests instead of fixing code
 - ❌ Tautological tests (tests that always pass)
+- ❌ Skipping fix loop (submitting with known failures)
 
 ## Verification Gate (MUST Pass Before Completion)
 1. ✅ Spec exists and is current
-2. ✅ Tests written before code
-3. ✅ All new tests pass
-4. ✅ FULL test suite passes (regression)
-5. ✅ Type check passes
-6. ✅ Lint passes
-7. ✅ Code polish complete
+2. ✅ Core flow E2E tests committed BEFORE implementation (evidence: E2E test commit precedes impl commit)
+3. ✅ Full E2E suite PASS (report attached)
+4. ✅ Edge case E2E tests added
+5. ✅ Full regression suite PASS
+6. ✅ Type check passes
+7. ✅ Lint passes
+8. ✅ Code polish complete
 If ANY check fails → fix it. Do NOT submit incomplete work to lead.
 
 ## Cost Guidelines
@@ -400,7 +466,7 @@ Add to `.claude/settings.json` hooks (merge, don't overwrite):
   "TaskCompleted": [{
     "hooks": [{
       "type": "prompt",
-      "prompt": "A teammate reported task completion. As team lead, you MUST verify ALL of the following before accepting. Do NOT accept incomplete work:\n1. Were tests written BEFORE implementation? (TDD — ask teammate for evidence)\n2. Does a reproduction test exist? (required for bug fixes)\n3. Did the FULL test suite pass? (not just new tests — ask for full suite output)\n4. Type check passed?\n5. Lint passed?\n6. Spec exists and is up-to-date?\n7. Code polish complete?\n\nIf ANY item fails, reject the task and send it back to the teammate with specific feedback on what to fix. Only mark the task complete when ALL 7 checks pass."
+      "prompt": "A teammate reported task completion. Perform these checks IN ORDER:\n\nSTEP 1: E2E Evidence Check\n- Does the completion message include an E2E report?\n- Expected format: ✅ passed: N  ❌ failed: N  ⏱ duration: Ns\n- If missing → REJECT: 'Attach E2E test execution results'\n\nSTEP 2: E2E Result Validation\n- If failed > 0 → REJECT: 'E2E test failures exist. Enter Fix Loop'\n- If passed == 0 → REJECT: 'No E2E tests found'\n\nSTEP 3: Core Flow Coverage\n- Do E2E tests cover the spec's acceptance criteria?\n- If missing flows → REJECT: 'Core flow {flow_name} E2E missing'\n\nSTEP 4: Regression Check\n- Full test suite results (existing tests not broken)\n- If regression failures → REJECT: 'Regression test failures'\n\nSTEP 5: Standard Checks\n- Type check PASS\n- Lint PASS\n- Code polish complete\n\nALL PASS → ACCEPT the task\nANY REJECT → Send rejection with reason and trigger Fix Loop:\n\nFix Loop Round {N}/3 triggered.\nReason: {rejection reason}\nAction required:\n1. Request failure analysis from debugger\n2. Debugger verifies: is the TEST correct or is the CODE wrong?\n3. Write fix plan based on analysis\n4. Report fix plan to team lead (me) for approval\n   - If plan is rejected, revise and resubmit (max 2 revisions)\n5. After approval, execute fix\n6. Re-run full E2E suite and report completion again\n\nFailure count: {N}/3. Escalation to user after 3 failures."
     }]
   }],
   "TeammateIdle": [{

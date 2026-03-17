@@ -223,6 +223,17 @@ This prevents bugs caused by outdated API usage.
         ]
       }
     ]
+    ,
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A teammate reported task completion. Perform these checks IN ORDER:\n\nSTEP 1: E2E Evidence Check\n- Does the completion message include an E2E report?\n- Expected format: ✅ passed: N  ❌ failed: N  ⏱ duration: Ns\n- If missing → REJECT: 'Attach E2E test execution results'\n\nSTEP 2: E2E Result Validation\n- If failed > 0 → REJECT: 'E2E test failures exist. Enter Fix Loop'\n- If passed == 0 → REJECT: 'No E2E tests found'\n\nSTEP 3: Core Flow Coverage\n- Do E2E tests cover the spec's acceptance criteria?\n- If missing flows → REJECT: 'Core flow {flow_name} E2E missing'\n\nSTEP 4: Regression Check\n- Full test suite results (existing tests not broken)\n- If regression failures → REJECT: 'Regression test failures'\n\nSTEP 5: Standard Checks\n- Type check PASS, Lint PASS, Code polish complete\n\nALL PASS → ACCEPT the task\nANY REJECT → Send rejection with reason + trigger Fix Loop (max 3 rounds, then escalate to user)"
+          }
+        ]
+      }
+    ]
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
@@ -1087,3 +1098,113 @@ Replace `{{FORMAT_COMMAND}}` in the PostToolUse hook based on detected tech stac
 | None detected | `echo "No formatter configured"` |
 
 **Note:** If project uses ESLint with `--fix`, consider: `npx eslint --fix "$CLAUDE_FILE_PATH" 2>/dev/null; npx prettier --write "$CLAUDE_FILE_PATH" 2>/dev/null || true`
+
+---
+
+## K. E2E Infrastructure Template
+
+Scaffolding for E2E test infrastructure. Use qa-tester SKILL.md auto-detection for platform/framework selection. project-setup defers to qa-tester conventions for framework-specific config defaults.
+
+### Directory Structure
+```
+e2e/
+├── fixtures/          # Test data, seeds
+├── pages/             # Page Object Model
+├── flows/             # User flow tests
+├── helpers/           # Utilities
+└── {{CONFIG_FILE}}    # playwright.config.ts / wdio.conf.ts etc.
+```
+
+### Config File Placeholder
+(Defer to qa-tester SKILL.md defaults for framework-specific settings)
+```
+{{E2E_CONFIG_CONTENT}}
+```
+
+Replace `{{E2E_CONFIG_CONTENT}}` based on detected platform:
+| Platform | Config File | Key |
+|----------|-----------|-----|
+| Web (React/Next/Vue/Svelte) | `playwright.config.ts` | `baseURL`, `retries: 1` |
+| Electron | `playwright.config.ts` | `use: { _electron }` |
+| Tauri | `wdio.conf.ts` | `capabilities: [{ 'tauri:options' }]` |
+| Flutter | `integration_test/` dir | No config file |
+| API (Node) | `playwright.config.ts` | `use: { baseURL: api }` |
+| API (Python) | `conftest.py` | `httpx.AsyncClient` fixture |
+| API (Go) | `*_test.go` | `httptest.NewServer` |
+
+### Base Fixture Templates
+
+#### Authenticated User Fixture (Playwright example)
+```typescript
+// e2e/fixtures/auth.ts
+import { test as base } from '@playwright/test';
+
+export const test = base.extend({
+  authenticatedPage: async ({ page }, use) => {
+    // Login flow — customize per project
+    await page.goto('/login');
+    await page.fill('[name="email"]', '{{TEST_USER_EMAIL}}');
+    await page.fill('[name="password"]', '{{TEST_USER_PASSWORD}}');
+    await page.click('button[type="submit"]');
+    await page.waitForURL('/dashboard');
+    await use(page);
+  },
+});
+```
+
+#### Empty State Fixture
+```typescript
+// e2e/fixtures/empty-state.ts
+import { test as base } from '@playwright/test';
+
+export const test = base.extend({
+  cleanPage: async ({ page }, use) => {
+    // Navigate to app with clean state
+    await page.goto('/');
+    await use(page);
+  },
+});
+```
+
+#### Seed Data Fixture
+```typescript
+// e2e/fixtures/seed-data.ts
+import { test as base } from '@playwright/test';
+
+export const test = base.extend({
+  seededPage: async ({ page }, use) => {
+    // Seed test data via API — customize per project
+    await page.request.post('/api/test/seed', {
+      data: { scenario: '{{SEED_SCENARIO}}' },
+    });
+    await page.goto('/');
+    await use(page);
+    // Cleanup after test
+    await page.request.post('/api/test/cleanup');
+  },
+});
+```
+
+### CLAUDE.md Addition Template
+```markdown
+## E2E Testing
+
+- E2E run: `{{E2E_RUN_COMMAND}}`
+- E2E single file: `{{E2E_SINGLE_COMMAND}}`
+- E2E UI mode: `{{E2E_UI_COMMAND}}`
+```
+
+Replace commands based on detected platform:
+| Platform | Run All | Single File | UI Mode |
+|----------|---------|------------|---------|
+| Playwright | `npx playwright test` | `npx playwright test e2e/flows/{file}.spec.ts` | `npx playwright test --ui` |
+| Cypress | `npx cypress run` | `npx cypress run --spec e2e/flows/{file}.cy.ts` | `npx cypress open` |
+| WebdriverIO | `npx wdio run wdio.conf.ts` | `npx wdio run wdio.conf.ts --spec e2e/flows/{file}.ts` | N/A |
+| pytest | `pytest e2e/` | `pytest e2e/flows/test_{file}.py` | N/A |
+
+### Generation Flow
+1. qa-tester auto-detection logic determines platform
+2. Present E2E framework install command to user for approval
+3. Generate config file + directory structure (`e2e/fixtures/`, `e2e/pages/`, `e2e/flows/`, `e2e/helpers/`)
+4. Generate base fixtures (authenticated user, empty state)
+5. Add E2E commands to CLAUDE.md
