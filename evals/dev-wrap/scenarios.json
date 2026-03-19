@@ -1,0 +1,53 @@
+{
+  "skill": "dev-wrap",
+  "description": "개발 세션 마무리 스킬 — 커밋 + 문서 업데이트 + 핸드오프 생성 + push",
+  "scenarios": [
+    {
+      "id": "clean-wrap",
+      "name": "일반적인 세션 마무리 (미커밋 변경 있음)",
+      "description": "작업 결과물이 있고, 커밋 + 문서 업데이트 + push 필요",
+      "setup": {
+        "requires_git": true,
+        "pre_commands": ["echo 'test content' > src/test-file.ts"]
+      },
+      "input": "마무리",
+      "expected": {
+        "behavior": "미커밋 변경 감지 → 커밋 메시지 제안 → 사용자 확인 → 핸드오프 생성 → push",
+        "must_contain": ["커밋", "핸드오프"],
+        "must_not_contain": [],
+        "output_format": "세션 마무리 완료 리포트"
+      }
+    },
+    {
+      "id": "wrap-with-team",
+      "name": "Agent Team 활성 상태에서 마무리",
+      "description": "활성 팀원이 있는 상태에서 세션을 마무리할 때 팀 정리 포함",
+      "setup": {
+        "requires_git": true,
+        "requires_team": true
+      },
+      "input": "오늘 여기까지",
+      "expected": {
+        "behavior": "팀 완료 상태 확인 → 미완료 task 보고 → 팀원 순차 종료 → 팀 삭제 → 핸드오프에 팀 정보 포함",
+        "must_contain": ["팀", "task", "핸드오프"],
+        "output_format": "세션 마무리 리포트 with 팀 정보"
+      }
+    },
+    {
+      "id": "nothing-to-commit",
+      "name": "변경사항 없는 마무리",
+      "description": "커밋할 변경이 없는 상태에서 세션 종료",
+      "setup": {
+        "requires_git": true,
+        "clean_working_tree": true
+      },
+      "input": "마무리하자",
+      "expected": {
+        "behavior": "변경사항 없음 감지 → 커밋 단계 스킵 → 핸드오프만 생성 → push (새 커밋 없으면 스킵)",
+        "must_contain": ["핸드오프"],
+        "must_not_contain": ["커밋할까요"],
+        "output_format": "간략한 세션 종료 리포트"
+      }
+    }
+  ]
+}

@@ -33,7 +33,7 @@ Done. Skills auto-trigger by keyword — no manual setup needed.
 | [usage-guide](usage-guide/) | "사용법", "usage guide", "매뉴얼" | Generates unified usage doc covering all skills, hooks, plugins, agents |
 | [team-setup](team-setup/) | "팀 셋업", "team setup", "팀 시스템 설정" | Scans project → identifies domains → generates tailored team skills + hooks + rules |
 | [team-dispatcher](team-dispatcher/) | "팀 불러와", "팀 소집", "team dispatch" | Analyzes user request → auto-selects right team (bugfix/review/feature/etc) |
-| [skill-eval](skill-eval/) | "스킬 평가", "eval skill", "benchmark skill" | Eval/benchmark/A/B compare skills — measures pass rate, tokens, time |
+| [skill-eval](skill-eval/) | "스킬 평가", "eval skill", "benchmark skill", "eval all", "대시보드" | Eval/benchmark/A/B compare/auto-generate scenarios/batch eval/dashboard — measures pass rate, tokens, time |
 | [security-guard](security-guard/) | "보안 검사", "security check", "security scan" | OWASP Top 10 auto-scan for changed code, blocks dangerous commands via PreToolUse |
 | [qa-tester](qa-tester/) | "QA", "E2E 테스트", "qa test", "실사용 테스트" | E2E QA — auto-detects platform (Web/Electron/Tauri/Flutter), runs app, tests user flows, reports bugs |
 
@@ -230,10 +230,52 @@ When lead's context fills during team work:
 | K. Agent Team | 5 | Team env, CLAUDE.md optimized, directory ownership, patterns, cost strategy |
 | **Total** | **46** | **A(39+) B(31-38) C(23-30) D(14-22) F(0-13)** |
 
+## Eval System
+
+All skills come with pre-built test scenarios for benchmarking and quality measurement.
+
+```
+evals/
+  {skill-name}/
+    scenarios.json        # Test scenarios (3+ per skill)
+    benchmark-*.json      # Benchmark results (auto-generated)
+  dashboard-*.json        # Overall dashboard snapshots
+```
+
+### Quick Commands
+
+| Command | What It Does |
+|---------|-------------|
+| "스킬 평가 code-polish" | Run eval on a single skill |
+| "benchmark skill security-guard" | Benchmark with history tracking |
+| "eval all" / "전체 평가" | Batch evaluate all skills |
+| "스킬 대시보드" / "skill dashboard" | Show overall dashboard |
+| "시나리오 생성 dev-start" | Auto-generate scenarios from SKILL.md |
+| "A/B 비교 code-polish" | Compare two versions of a skill |
+
+### Dashboard Example
+
+```
+## Skill Evaluation Dashboard
+
+| Skill           | Scenarios | Pass Rate | Tokens | Trend |
+|-----------------|-----------|-----------|--------|-------|
+| spec-writer     | 3         | 100%      | 107K   | --    |
+| code-polish     | 3         | 66.7%     | 3.4K   | UP    |
+| security-guard  | 3         | 100%      | 2.8K   | NEW   |
+| dev-start       | 3         | --        | --     | --    |
+| ...             | ...       | ...       | ...    | ...   |
+```
+
 ## Structure
 
 ```
 skill-name/
   SKILL.md              # Main skill file (required)
   supporting-file.*     # Only if referenced from SKILL.md
+
+evals/
+  {skill-name}/
+    scenarios.json      # Test scenarios
+    benchmark-*.json    # Results history
 ```

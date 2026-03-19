@@ -1,0 +1,62 @@
+{
+  "skill": "team-setup",
+  "description": "팀 셋업 스킬 — 프로젝트 분석 → 도메인 식별 → 팀 스킬 자동 생성",
+  "scenarios": [
+    {
+      "id": "fullstack-webapp",
+      "name": "풀스택 웹앱 (Next.js + API)",
+      "description": "프론트엔드 + 백엔드 + DB가 있는 풀스택 웹앱에서 팀 구성",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"fullstack-app\",\n  \"dependencies\": {\n    \"next\": \"15.0.0\",\n    \"@prisma/client\": \"6.0.0\"\n  }\n}",
+          "src/app/page.tsx": "export default function Home() { return <div>Home</div>; }",
+          "src/app/api/users/route.ts": "export async function GET() { return Response.json([]); }",
+          "src/app/(admin)/dashboard/page.tsx": "export default function Admin() { return <div>Admin</div>; }",
+          "prisma/schema.prisma": "model User { id Int @id }"
+        }
+      },
+      "input": "팀 셋업",
+      "expected": {
+        "behavior": "도메인 식별(public, admin, api) → Pattern A(Full-Stack) 추천 → 4개 유지보수 팀 포함 → 사용자 확인",
+        "must_contain": ["도메인", "Full-Stack", "team-bugfix", "team-review"],
+        "domains_min": 2,
+        "maintenance_teams": 4
+      }
+    },
+    {
+      "id": "simple-api",
+      "name": "단순 API 서버",
+      "description": "백엔드 API만 있는 단순한 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"api-server\",\n  \"dependencies\": {\n    \"express\": \"5.0.0\"\n  }\n}",
+          "src/routes/users.ts": "export const usersRouter = {};",
+          "src/routes/auth.ts": "export const authRouter = {};"
+        }
+      },
+      "input": "team setup",
+      "expected": {
+        "behavior": "단순 구조 감지 → Pattern C(Specialist Pair) 추천 → 도메인 1~2개",
+        "must_contain": ["Specialist", "도메인"],
+        "pattern": "C"
+      }
+    },
+    {
+      "id": "existing-teams",
+      "name": "이미 팀 스킬이 있는 프로젝트",
+      "description": "기존 팀 스킬이 설치된 상태에서 재실행",
+      "setup": {
+        "requires_git": true,
+        "requires_existing_teams": true
+      },
+      "input": "팀 시스템 설정",
+      "expected": {
+        "behavior": "기존 팀 스킬 감지 → 덮어쓸지 사용자 확인 → 새 도메인만 추가 제안",
+        "must_contain": ["기존", "팀"],
+        "output_format": "기존 팀 현황 + 업데이트 제안"
+      }
+    }
+  ]
+}

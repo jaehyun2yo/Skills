@@ -1,0 +1,51 @@
+{
+  "skill": "skill-register",
+  "description": "스킬 등록 스킬 — 스킬 디스커버리 + CLAUDE.md 등록 + 심링크 생성",
+  "scenarios": [
+    {
+      "id": "unregistered-skills",
+      "name": "미등록 스킬 발견 및 등록",
+      "description": "심링크는 있으나 CLAUDE.md에 미등록된 스킬이 있는 경우",
+      "setup": {
+        "requires_git": true,
+        "requires_skills_dir": true
+      },
+      "input": "스킬 등록",
+      "expected": {
+        "behavior": "스킬 디스커버리 → 미등록 스킬 감지 → 등록 현황 테이블 표시 → CLAUDE.md 업데이트 제안",
+        "must_contain": ["등록 현황", "미등록", "CLAUDE.md"],
+        "output_format": "스킬 등록 현황 테이블 + 등록 제안"
+      }
+    },
+    {
+      "id": "all-registered",
+      "name": "모든 스킬이 이미 등록된 상태",
+      "description": "모든 스킬이 정상 등록/심링크 되어있는 경우",
+      "setup": {
+        "requires_git": true,
+        "all_skills_registered": true
+      },
+      "input": "register skill",
+      "expected": {
+        "behavior": "모든 스킬이 이미 등록됨 확인 → 추가 작업 없음 안내",
+        "must_contain": ["등록", "정상"],
+        "output_format": "등록 현황 (모두 정상)"
+      }
+    },
+    {
+      "id": "missing-symlinks",
+      "name": "심링크 누락된 스킬",
+      "description": "SKILL.md는 있으나 심링크가 없는 경우",
+      "setup": {
+        "requires_git": true,
+        "broken_symlinks": true
+      },
+      "input": "스킬 연결",
+      "expected": {
+        "behavior": "심링크 누락 감지 → 절대 경로로 심링크 생성 제안 → 사용자 확인 후 생성",
+        "must_contain": ["심링크", "생성"],
+        "output_format": "등록 현황 + 심링크 생성 제안"
+      }
+    }
+  ]
+}

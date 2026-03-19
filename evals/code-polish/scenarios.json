@@ -1,0 +1,63 @@
+{
+  "skill": "code-polish",
+  "description": "코드 정리 스킬 — 불필요 코드 제거, 품질 개선, 성능 최적화, 타입 강화",
+  "scenarios": [
+    {
+      "id": "unused-imports",
+      "name": "미사용 import가 있는 TypeScript 파일",
+      "description": "사용하지 않는 import문이 포함된 파일에서 정리 실행",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/unused-imports.ts": "import { useState, useEffect, useCallback, useMemo } from 'react';\nimport axios from 'axios';\nimport { format } from 'date-fns';\n\nexport function Counter() {\n  const [count, setCount] = useState(0);\n  return <div>{count}</div>;\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/unused-imports.ts"]
+      },
+      "input": "코드정리",
+      "expected": {
+        "behavior": "미사용 import(useEffect, useCallback, useMemo, axios, format) 제거. useState만 유지",
+        "must_contain": ["미사용 import", "제거"],
+        "files_changed": ["src/test-fixtures/unused-imports.ts"],
+        "validation": "파일에 useState만 import되어 있어야 함"
+      }
+    },
+    {
+      "id": "magic-numbers",
+      "name": "매직 넘버가 있는 코드",
+      "description": "의미 불명확한 숫자 리터럴이 코드에 직접 사용된 경우",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/magic-numbers.ts": "export function calculatePrice(base: number, quantity: number): number {\n  if (quantity > 100) {\n    return base * quantity * 0.85;\n  } else if (quantity > 50) {\n    return base * quantity * 0.9;\n  } else if (quantity > 10) {\n    return base * quantity * 0.95;\n  }\n  return base * quantity * 1.1;\n}\n\nexport function isValidAge(age: number): boolean {\n  return age >= 0 && age <= 150;\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/magic-numbers.ts"]
+      },
+      "input": "코드 다듬어",
+      "expected": {
+        "behavior": "매직 넘버(0.85, 0.9, 0.95, 1.1, 100, 50, 10, 150)를 이름 있는 상수로 추출",
+        "must_contain": ["매직", "상수"],
+        "files_changed": ["src/test-fixtures/magic-numbers.ts"],
+        "validation": "상수 선언이 추가되어야 함"
+      }
+    },
+    {
+      "id": "no-improvements",
+      "name": "이미 깨끗한 코드",
+      "description": "정리할 항목이 없는 잘 작성된 코드",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/clean-code.ts": "const MAX_RETRIES = 3;\nconst TIMEOUT_MS = 5000;\n\nexport async function fetchData(url: string): Promise<Response> {\n  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {\n    try {\n      const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });\n      return response;\n    } catch (error) {\n      if (attempt === MAX_RETRIES - 1) throw error;\n    }\n  }\n  throw new Error('Unreachable');\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/clean-code.ts"]
+      },
+      "input": "polish",
+      "expected": {
+        "behavior": "검토 후 정리할 항목 없음 리포트",
+        "must_contain": ["정리할 항목 없음"],
+        "files_changed": [],
+        "validation": "파일 변경 없어야 함"
+      }
+    }
+  ]
+}

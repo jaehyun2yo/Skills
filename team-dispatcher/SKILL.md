@@ -1,6 +1,6 @@
 ---
 name: team-dispatcher
-description: Analyzes user request to select the right Agent Team (bugfix/review/refactor/performance/feature), dispatches to correct team skill. Triggers on "team dispatch", "팀 디스패치", "팀 선택", "어떤 팀".
+description: Analyzes user request to select the right Agent Team (bugfix/review/refactor/performance/feature), dispatches to correct team skill. Triggers on "팀 호출", "team dispatch", "팀 디스패치", "팀 선택", "어떤 팀".
 ---
 
 # Team Dispatcher

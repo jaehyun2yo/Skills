@@ -1,0 +1,63 @@
+{
+  "skill": "security-guard",
+  "description": "보안 자동 검사 스킬 — OWASP Top 10 취약점 탐지 + 수정 제안",
+  "scenarios": [
+    {
+      "id": "sql-injection",
+      "name": "SQL Injection 취약점",
+      "description": "문자열 연결로 SQL 쿼리를 구성하는 코드 탐지",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/vulnerable-query.ts": "import { db } from './database';\n\nexport async function getUser(userId: string) {\n  const result = await db.query(`SELECT * FROM users WHERE id = '${userId}'`);\n  return result.rows[0];\n}\n\nexport async function searchUsers(name: string) {\n  const result = await db.query('SELECT * FROM users WHERE name LIKE ' + \"'%\" + name + \"%'\");\n  return result.rows;\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/vulnerable-query.ts"]
+      },
+      "input": "보안 검사",
+      "expected": {
+        "behavior": "SQL Injection CRITICAL 2건 탐지 + parameterized query 수정 제안",
+        "must_contain": ["CRITICAL", "SQL Injection", "parameterized"],
+        "severity": "CRITICAL",
+        "finding_count_min": 2
+      }
+    },
+    {
+      "id": "hardcoded-secrets",
+      "name": "하드코딩된 비밀 키",
+      "description": "소스 코드에 API 키와 비밀번호가 직접 포함된 경우",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/hardcoded-secrets.ts": "const API_KEY = 'sk-proj-abc123def456ghi789';\nconst DB_PASSWORD = 'super_secret_password_123!';\nconst JWT_SECRET = 'my-jwt-secret-key-do-not-share';\n\nexport function getApiClient() {\n  return new ApiClient({ apiKey: API_KEY });\n}\n\nexport function connectDB() {\n  return createConnection({ password: DB_PASSWORD });\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/hardcoded-secrets.ts"]
+      },
+      "input": "security scan",
+      "expected": {
+        "behavior": "하드코딩된 API 키, DB 비밀번호, JWT secret CRITICAL 탐지 + 환경변수 사용 제안",
+        "must_contain": ["CRITICAL", "하드코딩", "환경변수"],
+        "severity": "CRITICAL",
+        "finding_count_min": 3
+      }
+    },
+    {
+      "id": "clean-code",
+      "name": "보안 문제 없는 코드",
+      "description": "parameterized query, 환경변수 사용 등 안전한 패턴으로 작성된 코드",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "src/test-fixtures/secure-code.ts": "import { db } from './database';\n\nexport async function getUser(userId: string) {\n  const result = await db.query('SELECT * FROM users WHERE id = $1', [userId]);\n  return result.rows[0];\n}\n\nexport function getApiClient() {\n  const apiKey = process.env.API_KEY;\n  if (!apiKey) throw new Error('API_KEY not set');\n  return new ApiClient({ apiKey });\n}\n"
+        },
+        "pre_commands": ["git add src/test-fixtures/secure-code.ts"]
+      },
+      "input": "보안 스캔",
+      "expected": {
+        "behavior": "보안 문제 없음 리포트",
+        "must_contain": ["취약점 없음"],
+        "severity": "NONE",
+        "finding_count_min": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "skill": "project-setup",
+  "description": "프로젝트 셋업 평가 스킬 — 48항목 체크리스트 스코어링 + 자동 생성",
+  "scenarios": [
+    {
+      "id": "empty-project",
+      "name": "셋업 없는 새 프로젝트 (F등급 예상)",
+      "description": "CLAUDE.md도 없고 .claude/ 디렉토리도 없는 빈 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"new-project\",\n  \"dependencies\": {\n    \"next\": \"15.0.0\",\n    \"react\": \"19.0.0\"\n  }\n}",
+          "src/index.ts": "console.log('hello');"
+        },
+        "files_to_delete": ["CLAUDE.md", ".claude/"]
+      },
+      "input": "셋업",
+      "expected": {
+        "behavior": "Tech Stack 감지(Next.js) → 48항목 스코어링 → F등급(0-14점) → Critical 추천 목록 → 생성 제안",
+        "must_contain": ["Next.js", "점", "Critical"],
+        "score_range": [0, 14],
+        "grade": "F"
+      }
+    },
+    {
+      "id": "partial-setup",
+      "name": "부분적 셋업 프로젝트 (C등급 예상)",
+      "description": "CLAUDE.md는 있으나 훅, 스킬, E2E 등이 부족한 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"partial-project\",\n  \"dependencies\": { \"next\": \"15.0.0\" },\n  \"scripts\": { \"test\": \"jest\", \"lint\": \"eslint .\" }\n}",
+          "CLAUDE.md": "# Project\n\n## Build\nnpm run build\n\n## Test\nnpm test\n",
+          ".claude/settings.json": "{}"
+        }
+      },
+      "input": "project setup",
+      "expected": {
+        "behavior": "기존 셋업 인식 + 부족한 항목(훅, 스킬, E2E, rules 등) 식별 → C등급 → 개선 제안",
+        "must_contain": ["점", "등급"],
+        "score_range": [25, 33],
+        "grade": "C"
+      }
+    },
+    {
+      "id": "well-configured",
+      "name": "잘 구성된 프로젝트 (A/B 등급 예상)",
+      "description": "CLAUDE.md, 훅, 스킬, 테스트, E2E 등이 충분히 구성된 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "requires_full_setup": true
+      },
+      "input": "설정",
+      "expected": {
+        "behavior": "높은 점수(34+) + A/B 등급 + 소수의 개선 제안",
+        "must_contain": ["점"],
+        "score_range": [34, 50],
+        "grade_one_of": ["A", "B"]
+      }
+    }
+  ]
+}

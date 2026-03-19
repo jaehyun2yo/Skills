@@ -1,0 +1,61 @@
+{
+  "skill": "qa-tester",
+  "description": "E2E QA 테스터 스킬 — 플랫폼 자동 감지 + E2E 테스트 작성/실행",
+  "scenarios": [
+    {
+      "id": "web-nextjs",
+      "name": "Next.js 웹앱 플랫폼 감지",
+      "description": "Next.js 프로젝트에서 Playwright 기반 E2E 테스트 환경 구성",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"test-web-app\",\n  \"dependencies\": {\n    \"next\": \"15.0.0\",\n    \"react\": \"19.0.0\"\n  }\n}"
+        }
+      },
+      "input": "QA 테스트 환경 구성해줘",
+      "expected": {
+        "behavior": "WEB 플랫폼 감지 → Playwright 선택 → E2E 디렉토리 구조 생성 → playwright.config.ts 생성",
+        "must_contain": ["WEB", "Playwright", "playwright.config"],
+        "platform_detected": "WEB",
+        "tool_selected": "Playwright"
+      }
+    },
+    {
+      "id": "electron-app",
+      "name": "Electron 앱 플랫폼 감지",
+      "description": "Electron 프로젝트에서 Playwright Electron API 선택",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"test-electron-app\",\n  \"dependencies\": {\n    \"electron\": \"33.0.0\"\n  }\n}",
+          "electron-builder.yml": "appId: com.test.app\nproductName: TestApp"
+        }
+      },
+      "input": "E2E 테스트",
+      "expected": {
+        "behavior": "ELECTRON 플랫폼 감지 → Playwright Electron API 선택 → _electron.launch 패턴 사용",
+        "must_contain": ["ELECTRON", "Playwright", "_electron"],
+        "platform_detected": "ELECTRON",
+        "tool_selected": "Playwright Electron API"
+      }
+    },
+    {
+      "id": "api-only",
+      "name": "API 서버 프로젝트",
+      "description": "Express 기반 API 서버에서 API 테스트 도구 선택",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "package.json": "{\n  \"name\": \"test-api-server\",\n  \"dependencies\": {\n    \"express\": \"5.0.0\"\n  }\n}"
+        }
+      },
+      "input": "QA",
+      "expected": {
+        "behavior": "API 플랫폼 감지 → Playwright API Testing 또는 supertest 선택",
+        "must_contain": ["API"],
+        "platform_detected": "API",
+        "tool_selected": "Playwright API / supertest"
+      }
+    }
+  ]
+}

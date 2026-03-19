@@ -1,0 +1,57 @@
+{
+  "skill": "dev-start",
+  "description": "개발 세션 시작 스킬 — 프로젝트 상태 파악 + 다음 작업 제안",
+  "scenarios": [
+    {
+      "id": "fresh-project",
+      "name": "새 프로젝트 (핸드오프/진행기록 없음)",
+      "description": "핸드오프 파일이나 progress.txt가 없는 상태에서 세션 시작",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {},
+        "files_to_delete": [".claude/handoff.md", "docs/progress.txt", "docs/features-list.md"]
+      },
+      "input": "개발 시작",
+      "expected": {
+        "behavior": "git 상태(브랜치, 최근 커밋) 표시 + 핸드오프/진행기록 없음 표시 + 추천 작업 제안",
+        "must_contain": ["브랜치", "최근 커밋", "추천"],
+        "must_not_contain": ["핸드오프 발견", "이전 세션에서 이어받은 것"],
+        "output_format": "세션 시작 리포트 (20줄 이내)"
+      }
+    },
+    {
+      "id": "with-handoff",
+      "name": "핸드오프 파일 있는 상태",
+      "description": "이전 세션에서 남긴 핸드오프 파일이 있을 때 세션 복원",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          ".claude/handoff.md": "# Session Handoff — 2026-03-18\n\n## 완료한 것\n- 로그인 API 구현\n- JWT 토큰 발급 로직\n\n## 진행 중 (미완료)\n- [ ] 비밀번호 재설정 API (src/auth/reset.ts:15)\n\n## 실패한 접근법 (Lore)\n- bcrypt 대신 argon2 시도했으나 Windows에서 빌드 실패 → bcrypt로 복귀\n\n## 다음 단계\n1. 비밀번호 재설정 API 완성\n2. 이메일 발송 연동"
+        }
+      },
+      "input": "개발 시작",
+      "expected": {
+        "behavior": "핸드오프 파일 감지 + 이전 세션 상태 복원 + Lore(실패한 접근법) 표시 + 다음 단계 제안",
+        "must_contain": ["핸드오프", "비밀번호 재설정", "Lore", "bcrypt", "다음 단계"],
+        "output_format": "세션 시작 리포트 with 핸드오프 요약"
+      }
+    },
+    {
+      "id": "complex-task-detection",
+      "name": "복잡한 작업 감지 → Agent Team 제안",
+      "description": "미해결 항목이 많고 다중 레이어 변경이 필요한 상태",
+      "setup": {
+        "requires_git": true,
+        "files_to_create": {
+          "docs/features-list.md": "# Features\n\n- [FAILING] 사용자 인증 시스템 리팩토링\n- [FAILING] API 응답 표준화\n- [FAILING] 프론트엔드 상태관리 마이그레이션\n- [FAILING] DB 스키마 마이그레이션\n- [FAILING] E2E 테스트 추가\n- [IN_PROGRESS] 로깅 시스템 통합"
+        }
+      },
+      "input": "시작하자. 전체 리팩토링을 해야해.",
+      "expected": {
+        "behavior": "미해결 항목 5개 이상 감지 + '리팩토링' 키워드 → Agent Team 구성 제안",
+        "must_contain": ["Agent Team", "추천", "팀"],
+        "output_format": "상태 리포트 + Agent Team 제안 (옵션 A/B/C)"
+      }
+    }
+  ]
+}

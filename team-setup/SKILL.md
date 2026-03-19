@@ -317,7 +317,8 @@ If ANY check fails → fix it. Do NOT submit incomplete work to lead.
 - 코드 변경 전 반드시 plan → 팀장 승인 후 구현
 
 ## Communication
-- 팀장에게만 SendMessage (팀원 간 직접 소통 금지)
+- 팀원 간 직접 SendMessage 허용 (협의, 버그 공유, 인터페이스 조율 등)
+- 중요 결정사항은 팀장에게도 SendMessage로 공유 (CC)
 - 보고 포맷: [역할] 상태: 내용
 ```
 
@@ -466,7 +467,7 @@ Add to `.claude/settings.json` hooks (merge, don't overwrite):
   "TaskCompleted": [{
     "hooks": [{
       "type": "prompt",
-      "prompt": "A teammate reported task completion. Perform these checks IN ORDER:\n\nSTEP 1: E2E Evidence Check\n- Does the completion message include an E2E report?\n- Expected format: ✅ passed: N  ❌ failed: N  ⏱ duration: Ns\n- If missing → REJECT: 'Attach E2E test execution results'\n\nSTEP 2: E2E Result Validation\n- If failed > 0 → REJECT: 'E2E test failures exist. Enter Fix Loop'\n- If passed == 0 → REJECT: 'No E2E tests found'\n\nSTEP 3: Core Flow Coverage\n- Do E2E tests cover the spec's acceptance criteria?\n- If missing flows → REJECT: 'Core flow {flow_name} E2E missing'\n\nSTEP 4: Regression Check\n- Full test suite results (existing tests not broken)\n- If regression failures → REJECT: 'Regression test failures'\n\nSTEP 5: Standard Checks\n- Type check PASS\n- Lint PASS\n- Code polish complete\n\nALL PASS → ACCEPT the task\nANY REJECT → Send rejection with reason and trigger Fix Loop:\n\nFix Loop Round {N}/3 triggered.\nReason: {rejection reason}\nAction required:\n1. Request failure analysis from debugger\n2. Debugger verifies: is the TEST correct or is the CODE wrong?\n3. Write fix plan based on analysis\n4. Report fix plan to team lead (me) for approval\n   - If plan is rejected, revise and resubmit (max 2 revisions)\n5. After approval, execute fix\n6. Re-run full E2E suite and report completion again\n\nFailure count: {N}/3. Escalation to user after 3 failures."
+      "prompt": "A teammate reported task completion. Perform these checks IN ORDER:\n\nSTEP 1: E2E Evidence Check\n- Does the completion message include an E2E report?\n- Expected format: ✅ passed: N  ❌ failed: N  ⏱ duration: Ns\n- If missing → REJECT: 'Attach E2E test execution results'\n\nSTEP 2: E2E Result Validation\n- If failed > 0 → REJECT: 'E2E test failures exist. Enter Fix Loop'\n- If passed == 0 → REJECT: 'No E2E tests found'\n\nSTEP 3: Core Flow Coverage\n- Do E2E tests cover the spec's acceptance criteria?\n- If missing flows → REJECT: 'Core flow {flow_name} E2E missing'\n\nSTEP 4: Regression Check\n- Full test suite results (existing tests not broken)\n- If regression failures → REJECT: 'Regression test failures'\n\nSTEP 5: Standard Checks\n- Type check PASS\n- Lint PASS\n- Code polish complete\n\nALL PASS → ACCEPT the task\nANY REJECT → Send rejection with reason and trigger Fix Loop:\n\nFix Loop Round {N}/3 triggered.\nReason: {rejection reason}\nAction required:\n1. Request failure analysis from debugger\n2. Debugger verifies: is the TEST correct or is the CODE wrong?\n3. Write fix plan based on analysis\n4. Report fix plan to team lead (me) for approval\n   - If plan is rejected, revise and resubmit (max 2 revisions)\n5. After approval, execute fix\n6. Re-run full E2E suite and report completion again\n\nFailure count: {N}/3. Escalation to user after 3 failures.\n\nSTEP 6: All Tasks Completion Check\nAfter ACCEPTING a task, use TaskList to check if ALL team tasks are now in 'completed' status.\n- IF all tasks completed: All team work is done. Proceed with full wrap-up sequence:\n  Step 1: [MAGIC KEYWORD: code-polish] — Invoke /code-polish via Skill tool if source files were changed.\n  Step 2: [MAGIC KEYWORD: dev-wrap] — Invoke /dev-wrap via Skill tool for full session wrap-up.\n- IF tasks remain incomplete: Do nothing. Let the team continue working."
     }]
   }],
   "TeammateIdle": [{

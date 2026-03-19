@@ -1,0 +1,40 @@
+{
+  "skill": "usage-guide",
+  "description": "사용법 가이드 생성 스킬 — 스킬/플러그인/훅/에이전트 통합 문서",
+  "scenarios": [
+    {
+      "id": "full-project",
+      "name": "풀 셋업 프로젝트 가이드 생성",
+      "description": "스킬, MCP 플러그인, 훅, 에이전트, 커맨드가 모두 있는 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "requires_skills_dir": true,
+        "requires_mcp_config": true,
+        "requires_hooks": true
+      },
+      "input": "사용법 가이드 만들어줘",
+      "expected": {
+        "behavior": "전체 컴포넌트 스캔 → 상호작용 분석 → 한국어 사용법 가이드 생성",
+        "must_contain": ["스킬", "플러그인", "훅", "워크플로우"],
+        "files_created": ["docs/usage-guide.md"],
+        "output_format": "가이드 요약 + 생성 확인"
+      }
+    },
+    {
+      "id": "minimal-project",
+      "name": "최소 구성 프로젝트",
+      "description": "CLAUDE.md와 기본 훅만 있는 간단한 프로젝트",
+      "setup": {
+        "requires_git": true,
+        "minimal_setup": true
+      },
+      "input": "usage guide",
+      "expected": {
+        "behavior": "최소 구성 감지 → 있는 것만 문서화 → 추가 셋업 추천",
+        "must_contain": ["빠른 시작"],
+        "files_created": ["docs/usage-guide.md"],
+        "output_format": "간략한 가이드 + 셋업 추천"
+      }
+    }
+  ]
+}

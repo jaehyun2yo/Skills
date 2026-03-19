@@ -1,12 +1,12 @@
 ---
 name: dev-wrap
-description: Session wrap-up — commits changes, shuts down Agent Teams, updates progress/features/changelog, generates handoff for next session. Triggers on "마무리", "끝", "done", "wrap up", "세션 정리", "오늘 여기까지", "커밋하고 끝", "정리해줘", "세션 끝", "마무리하자".
+description: Session wrap-up — commits changes, shuts down Agent Teams, updates progress/features/changelog, generates handoff, pushes to GitHub. Triggers on "마무리", "끝", "done", "wrap up", "세션 정리", "오늘 여기까지", "커밋하고 끝", "정리해줘", "세션 끝", "마무리하자".
 ---
 
 # Dev Wrap — 개발 세션 마무리
 
 세션 종료 전에 모든 변경을 정리하고 다음 세션을 위한 핸드오프를 준비한다.
-활성 Agent Team이 있으면 안전하게 정리한다.
+활성 Agent Team이 있으면 안전하게 정리하고, 모든 커밋을 GitHub에 push한다.
 
 ---
 
@@ -26,34 +26,46 @@ cat .omc/state/team-state.json 2>/dev/null | head -5 || echo "NO_ACTIVE_TEAM"
 
 ---
 
-## Step 2: Agent Team 정리 (활성 팀이 있는 경우)
+## Step 2: Agent Team 완료 판단 + 정리
 
-현재 세션에 활성 팀이 있으면 세션 종료 전에 정리:
+현재 세션에 활성 팀이 있으면, 전체 완료 여부를 판단하고 정리한다.
 
-### 2.1 팀원 작업 완료 확인
-`Ctrl+T`(task list 토글)로 미완료 task가 있는지 체크.
-(단축키는 Claude Code 버전에 따라 변경될 수 있음)
+### 2.1 전체 작업 완료 판단 (팀 리더 역할)
+
+팀 리더는 다음 기준으로 **전체 완료**를 판단한다:
+
+```bash
+# 1. 전체 task 상태 확인
+# TaskList로 모든 task의 status를 조회
+# → 모든 task가 completed 상태인지 확인
+
+# 2. 활성 팀원 확인
+# → idle 상태가 아닌 팀원이 남아있는지 확인
+```
+
+**판단 기준:**
+- 모든 task가 `completed` → **전체 완료 확정** → Step 2.2로 진행
+- 미완료 task 존재 → 사용자에게 보고: **"[N]개 task가 미완료입니다. 마무리할까요, 계속 작업할까요?"**
+  - 마무리 선택 → 미완료 task를 progress.txt에 "미완료" 기록 후 진행
+  - 계속 선택 → dev-wrap 중단
 
 ### 2.2 팀원 순차 종료 (Graceful Shutdown)
-리드 세션에서 자연어로 각 팀원에게 종료 요청:
-> "Ask [teammate-name] to shut down"
+각 팀원에게 종료 요청:
+> SendMessage로 각 팀원에게 "작업이 모두 완료되었습니다. 종료해주세요." 전송
 
 - 모든 팀원이 종료될 때까지 대기
 - 팀원이 거부하면 사유 확인 후 사용자에게 보고
 
 ### 2.3 팀 삭제
-리드 세션에서 자연어로 팀 정리 요청:
-> "Clean up the team"
+TeamDelete로 팀 정리.
 
 ### 2.4 팀 세션 기록
 팀으로 작업한 경우 progress.txt에 팀 정보 추가 기록:
 ```
 - **팀 구성**: [팀원 수]명 ([역할1], [역할2], ...)
 - **팀 작업 결과**: [완료된 task 수]/[전체 task 수] 완료
+- **미완료 task**: [있으면 목록, 없으면 "없음"]
 ```
-
-**사용자에게 확인**: **"활성 팀이 있습니다. 팀을 정리하고 마무리할까요?"**
-- 사용자가 팀 유지를 원하면 팀 정리 건너뜀 (다음 세션에서 새로 spawn 필요 안내)
 
 ---
 
@@ -145,7 +157,43 @@ docs: update progress and features-list for session #NNN
 
 ---
 
-## Step 7: 세션 종료 리포트
+## Step 7: GitHub Push
+
+모든 커밋 완료 후 원격 저장소에 push한다.
+
+### 7.1 Push 전 확인
+
+```bash
+# 현재 브랜치와 리모트 상태 확인
+git branch --show-current
+git remote -v
+git log --oneline @{upstream}..HEAD 2>/dev/null || echo "NO_UPSTREAM"
+```
+
+### 7.2 Push 실행
+
+```bash
+# upstream이 설정된 경우
+git push
+
+# upstream이 없는 경우 (새 브랜치)
+git push -u origin $(git branch --show-current)
+```
+
+- push 실패 시 → 에러 내용을 사용자에게 보고 (force push 절대 금지)
+- conflict 발생 시 → 사용자에게 보고하고 해결 방법 안내
+
+### 7.3 Push 결과 확인
+
+```bash
+# push 성공 확인
+git log --oneline -3
+echo "✓ GitHub push 완료: $(git remote get-url origin) / $(git branch --show-current)"
+```
+
+---
+
+## Step 8: 세션 종료 리포트
 
 ```
 ## 세션 마무리 완료
@@ -155,6 +203,7 @@ docs: update progress and features-list for session #NNN
 - 변경 파일: N개
 - 완료 항목: [항목들]
 - 팀 작업: [사용했으면 — N명 팀, M/T tasks 완료 | 미사용 시 생략]
+- GitHub: [push 완료 — 브랜치명, 커밋 수]
 
 ### 다음 세션에서 할 것
 1. [가장 중요한 다음 작업]
@@ -183,3 +232,6 @@ docs: update progress and features-list for session #NNN
 10. **핸드오프 항상 생성** — 세션 종료 시 .claude/handoff.md를 반드시 생성/갱신
 11. **Lore 필수 기록** — 실패한 접근법이 있으면 핸드오프에 반드시 포함
 12. **핸드오프 ≠ 커밋** — .claude/handoff.md는 로컬 상태 파일, git에 커밋하지 않음
+13. **GitHub push 필수** — 모든 커밋 후 반드시 push (팀 작업 여부 무관)
+14. **force push 금지** — push 실패 시 사용자에게 보고, 절대 --force 사용 금지
+15. **팀 완료 자동 판단** — 팀 리더는 TaskList로 전체 task 상태를 확인하여 완료 여부 자동 판단
